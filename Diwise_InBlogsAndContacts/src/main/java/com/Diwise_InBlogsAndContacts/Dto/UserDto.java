@@ -1,0 +1,14 @@
+package com.Diwise_InBlogsAndContacts.Dto;
+
+import lombok.Data;
+import lombok.ToString;
+import lombok.experimental.Accessors;
+
+@ToString
+@Data
+@Accessors(chain = true)
+public class UserDto {
+	private int id;
+	private String username;
+
+}
