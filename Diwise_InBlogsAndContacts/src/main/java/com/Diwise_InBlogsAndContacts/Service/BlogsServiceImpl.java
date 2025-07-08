@@ -211,7 +211,7 @@ public class BlogsServiceImpl implements BlogsService {
 
 	        Path filePath = uploadPath.resolve(fileName);
 	        Files.write(filePath, image.getBytes());
-	        return "https://diwise.cloud/DewiseUKblog/" + fileName;
+	        return "https://diwise.cloud/DiwiseIn/" + fileName;
 	    }
 
 	    return null;
