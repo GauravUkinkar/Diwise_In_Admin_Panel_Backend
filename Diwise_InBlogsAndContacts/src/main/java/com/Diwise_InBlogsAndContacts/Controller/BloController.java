@@ -60,6 +60,7 @@ public class BloController {
 	@DeleteMapping("/deleteblog")
 	public ResponseEntity<Message<BlogsDto>> deleteBlog(@RequestParam("bId") int bId) {
 		Message<BlogsDto> message = blogService.deleteBlog(bId);
+		log.info("Blog deleted successfully");
 		HttpStatus httpStatus = HttpStatus.valueOf(message.getStatus().value());
 		return ResponseEntity.status(httpStatus).body(message);
 		
