@@ -8,7 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 import lombok.ToString;
-import lombok.experimental.Accessors;
+
 
 @Data
 @ToString
