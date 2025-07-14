@@ -1,0 +1,69 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven3'
+        jdk 'java17'
+    }
+
+    environment {
+        MAVEN_OPTS = '-Dmaven.test.failure.ignore=true'
+        DEPLOY_PATH = '/opt/testTomcat/webapps/'
+        WAR_NAME = 'DiwiseInAdminPanel.war'
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                git branch: 'master', credentialsId: 'githubToken', url: 'https://github.com/GauravUkinkar/Diwise_In_Admin_Panel_Backend.git'
+            }
+        }
+
+        stage('Build Project') {
+            steps {
+                sh 'mvn -f Diwise_InBlogsAndContacts/pom.xml clean install -DskipTests'
+            }
+        }
+
+        stage('Deploy to VPS') {
+            steps {
+                script {
+                    sh '''
+                        echo "Removing existing WAR if present..."
+                        if [ -f "$DEPLOY_PATH$WAR_NAME" ]; then
+                            rm -f "$DEPLOY_PATH$WAR_NAME"
+                        fi
+
+                        echo "Copying new WAR to Tomcat webapps..."
+                        cp Diwise_InBlogsAndContacts/target/$WAR_NAME $DEPLOY_PATH
+                    '''
+                }
+            }
+        }
+
+       stage('Restart Tomcat') {
+    steps {
+        script {
+            sh '''
+                echo "Restarting Tomcat..."
+                sudo /opt/testTomcat/bin/shutdown.sh
+                sleep 5
+                sudo /opt/testTomcat/bin/startup.sh
+            '''
+        }
+    }
+}
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution completed.'
+        }
+        success {
+            echo 'Build and Deployment succeeded!'
+        }
+        failure {
+            echo 'Build or Deployment failed.'
+        }
+    }
+}

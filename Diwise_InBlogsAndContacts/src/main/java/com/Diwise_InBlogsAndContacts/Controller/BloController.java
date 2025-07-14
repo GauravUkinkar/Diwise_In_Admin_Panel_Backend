@@ -3,6 +3,7 @@ package com.Diwise_InBlogsAndContacts.Controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -35,9 +36,9 @@ public class BloController {
 	private final BlogsService blogService;
 	
 	
-	@PostMapping("/addblog")
+	@PostMapping(value="/addblog", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Message<BlogsDto>> uploadBlog(@RequestPart("blog") String BlogsDtojson,
-			@RequestPart("featureimage") MultipartFile featureimage) 
+			@RequestPart(value = "featureimage", required = false) MultipartFile featureimage) 
 	throws JsonMappingException, JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		BlogsDto dto = objectMapper.readValue(BlogsDtojson, BlogsDto.class);
@@ -46,9 +47,9 @@ public class BloController {
 		return ResponseEntity.status(httpStatus).body(message);
 		
 	}	
-	@PutMapping("/updateblog")
+	@PutMapping(value="/updateblog", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<Message<BlogsDto>> updateBlog(@RequestPart("blog") String BlogDtojson,
-			@RequestPart("featureimage") MultipartFile featureimage) 
+			@RequestPart(value="featureimage", required = false) MultipartFile featureimage) 
 	throws JsonMappingException, JsonProcessingException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		BlogsDto dto = objectMapper.readValue(BlogDtojson, BlogsDto.class);
@@ -59,6 +60,7 @@ public class BloController {
 	@DeleteMapping("/deleteblog")
 	public ResponseEntity<Message<BlogsDto>> deleteBlog(@RequestParam("bId") int bId) {
 		Message<BlogsDto> message = blogService.deleteBlog(bId);
+		log.info("Blog deleted successfully");
 		HttpStatus httpStatus = HttpStatus.valueOf(message.getStatus().value());
 		return ResponseEntity.status(httpStatus).body(message);
 		
