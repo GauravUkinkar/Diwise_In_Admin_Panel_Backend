@@ -1,6 +1,4 @@
 package com.Diwise_InBlogsAndContacts.Service;
-
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -29,65 +27,99 @@ public class BlogsServiceImpl implements BlogsService {
 	public String uploadDirectory;
 
 	@Override
-	public Message<BlogsDto> addBlogs(BlogsDto blogsDto,MultipartFile images) {
-		Message<BlogsDto> message = new Message<>();
-		log.info("In BlogsServiceImpl addBlogs() with request: {}", blogsDto);
-		Blogs blog=new Blogs();
-		try {
-			blog.setTitle(blogsDto.getTitle());
-			blog.setDescription(blogsDto.getDescription());
-			blog.setCategory(blogsDto.getCategory());
-			blog.setDate(blogsDto.getDate());
-			blog.setFeaturedImage(uploadImage(images, images.getOriginalFilename()));
-			blogsRepository.save(blog);
-			blogsDto.setFeaturedImage(blog.getFeaturedImage());
-			message.setData(blogsDto);
-			message.setResponseMessage(Constants.BLOG_ADDED_SUCCESSFULLY);
-			message.setStatus(HttpStatus.CREATED);
-			return message;
-		} catch (Exception e) {
-			throw new RuntimeException(Constants.SOMETHING_WENT_WRONG, e);
-		}
+	public Message<BlogsDto> addBlogs(BlogsDto blogsDto, MultipartFile images) {
+	    Message<BlogsDto> message = new Message<>();
+	    log.info("In BlogsServiceImpl addBlogs() with request: {}", blogsDto);
+
+	    try {
+	        Blogs blog = new Blogs();
+	        blog.setTitle(blogsDto.getTitle());
+	        blog.setDescription(blogsDto.getDescription());
+	        blog.setCategory(blogsDto.getCategory());
+	        blog.setDate(blogsDto.getDate());
+
+	        if (images != null && !images.isEmpty()) {
+	            String imageUrl = uploadImage(images, images.getOriginalFilename());
+	            blog.setFeaturedImage(imageUrl);
+	            blogsDto.setFeaturedImage(imageUrl);
+	        }
+
+	        blogsRepository.save(blog);
+	        blogsDto.setBId(blog.getBId());
+
+	        message.setData(blogsDto);
+	        message.setResponseMessage(Constants.BLOG_ADDED_SUCCESSFULLY);
+	        message.setStatus(HttpStatus.CREATED);
+	        return message;
+
+	    } catch (RuntimeException e) {
+	        message.setStatus(HttpStatus.BAD_REQUEST);
+	        message.setResponseMessage(e.getMessage());
+	        message.setData(null);
+	        return message;
+	    } catch (Exception e) {
+	        message.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+	        message.setResponseMessage(Constants.SOMETHING_WENT_WRONG);
+	        message.setData(null);
+	        return message;
+	    }
 	}
+
 	@Override
-	public Message<BlogsDto> updateBlog(BlogsDto request,MultipartFile images) {
-		 Message<BlogsDto> message = new Message<>();
-		    try {
-		        Blogs blog = blogsRepository.findById(request.getBId()).orElse(null);
+	public Message<BlogsDto> updateBlog(BlogsDto request, MultipartFile images) {
+	    Message<BlogsDto> message = new Message<>();
+	    log.info("In BlogsServiceImpl updateBlog() with request: {}", request);
+	    try {
+	        Blogs blog = blogsRepository.findById(request.getBId()).orElse(null);
+	        if (blog == null) {
+	            message.setStatus(HttpStatus.NOT_FOUND);
+	            message.setResponseMessage(Constants.BLOG_NOT_FOUND);
+	            message.setData(null);
+	            return message;
+	        }
+	        if (request.getTitle() != null && !request.getTitle().isBlank()) {
+	            blog.setTitle(request.getTitle());
+	        }
 
-		        if (blog != null) {
-		            boolean isOnlyImageUpdate = (request.getTitle() == null || request.getTitle().isBlank())
-		                    && (request.getCategory() == null || request.getCategory().isBlank())
-		                    && (request.getDescription() == null || request.getDescription().isBlank())
-		                    && (request.getDate() == null);
-		            if (images != null && !images.isEmpty()) {
-		                blog.setFeaturedImage(uploadImage(images, images.getOriginalFilename()));
-		            }
-		            if (!isOnlyImageUpdate) {
-		                blog.setTitle(request.getTitle());
-		                blog.setCategory(request.getCategory());
-		                blog.setDescription(request.getDescription());
-		                blog.setDate(request.getDate());
-		            }
-		            blogsRepository.save(blog);
+	        if (request.getCategory() != null && !request.getCategory().isBlank()) {
+	            blog.setCategory(request.getCategory());
+	        }
 
-		            request.setBId(blog.getBId());
-		            request.setFeaturedImage(blog.getFeaturedImage());
-		           
+	        if (request.getDescription() != null && !request.getDescription().isBlank()) {
+	            blog.setDescription(request.getDescription());
+	        }
 
-		            message.setData(request);
-		            message.setResponseMessage(Constants.BLOG_UPDATED);
-		            message.setStatus(HttpStatus.CREATED);
-		            return message;
-		        } else {
-		            message.setResponseMessage(Constants.BLOG_NOT_FOUND);
-		            message.setStatus(HttpStatus.NOT_FOUND);
-		            return message;
-		        }
-		    } catch (Exception e) {
-		        throw new RuntimeException(Constants.SOMETHING_WENT_WRONG, e);
-		    }
+	        if (request.getDate() != null) {
+	            blog.setDate(request.getDate());
+	        }
+	        if (images != null && !images.isEmpty()) {
+	            String imageUrl = uploadImage(images, images.getOriginalFilename());
+	            blog.setFeaturedImage(imageUrl);
+	            request.setFeaturedImage(imageUrl); 
+	        }
+	        blogsRepository.save(blog);
+	        request.setTitle(blog.getTitle());
+	        request.setCategory(blog.getCategory());
+	        request.setDescription(blog.getDescription());
+	        request.setDate(blog.getDate());
+	        request.setFeaturedImage(blog.getFeaturedImage());
+	        message.setData(request);
+	        message.setResponseMessage(Constants.BLOG_UPDATED);
+	        message.setStatus(HttpStatus.OK);
+	        return message;
+	    } catch (RuntimeException e) {
+	        message.setStatus(HttpStatus.BAD_REQUEST);
+	        message.setResponseMessage(e.getMessage());
+	        message.setData(null);
+	        return message;
+	    } catch (Exception e) {
+	        message.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+	        message.setResponseMessage(Constants.SOMETHING_WENT_WRONG);
+	        message.setData(null);
+	        return message;
+	    }
 	}
+
 
 	@Override
 	public List<Message<BlogsDto>> getAllBlogs() {
@@ -195,26 +227,33 @@ public class BlogsServiceImpl implements BlogsService {
 
 
 	
-	private String uploadImage(MultipartFile image, String imageName) throws IOException {
+	private String uploadImage(MultipartFile image, String imageName) {
 	    final long MAX_FILE_SIZE = 2 * 1024 * 1024; 
 
-	    if (image != null && !image.isEmpty()) {
-	        if (image.getSize() > MAX_FILE_SIZE) {
-	            throw new IOException("File size exceeds 2MB limit.");
+	    try {
+	        if (image != null && !image.isEmpty()) {
+	            if (image.getSize() > MAX_FILE_SIZE) {
+	             
+	                throw new RuntimeException("File size exceeds 2MB limit. Please upload a smaller image.");
+	            }
+
+	            String fileName = imageName;
+	            Path uploadPath = Paths.get(uploadDirectory);
+	            if (!Files.exists(uploadPath)) {
+	                Files.createDirectories(uploadPath);
+	            }
+
+	            Path filePath = uploadPath.resolve(fileName);
+	            Files.write(filePath, image.getBytes());
+
+	            return "https://diwise.cloud/akkafoundation/" + fileName;
+	        } else {
+	            return "No image provided.";
 	        }
 
-	        String fileName = imageName;
-	        Path uploadPath = Paths.get(uploadDirectory);
-	        if (!Files.exists(uploadPath)) {
-	            Files.createDirectories(uploadPath);
-	        }
-
-	        Path filePath = uploadPath.resolve(fileName);
-	        Files.write(filePath, image.getBytes());
-	        return "https://diwise.cloud/DiwiseIn/" + fileName;
+	    } catch (Exception e) {
+	        throw new RuntimeException("Unexpected error during image upload: " + e.getMessage(), e);
 	    }
-
-	    return null;
 	}
 
 }
