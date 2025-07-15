@@ -26,11 +26,11 @@ public class UserServiceImpl implements UserService {
 		User user = new User();
 		UserDto userDto1 = new UserDto();
 		try {
-			user.setEmail(userDto.getEmail());
+			user.setUsername(userDto.getUsername());
 			user.setPassword(userDto.getPassword());
 			user = userRepository.save(user);
 			userDto1.setId(user.getId());
-			userDto1.setEmail(user.getEmail());
+			userDto1.setUsername(user.getUsername());
 			message.setStatus(HttpStatus.CREATED);
 			message.setResponseMessage(Constants.SUCCESS);
 			message.setData(userDto1);
@@ -47,13 +47,13 @@ public class UserServiceImpl implements UserService {
 	public Message<UserDto> login(LoginDto loginDto) {
 		Message<UserDto> message = new Message<>();
 		User user = new User();
-		user = userRepository.findByUsername(loginDto.getEmail());
+		user = userRepository.findByUsername(loginDto.getUsername());
 		try {
 
 			if (user.getPassword().equals(loginDto.getPassword())) {
 				UserDto userDto = new UserDto();
 				userDto.setId(user.getId());
-				userDto.setEmail(user.getEmail());
+				userDto.setUsername(user.getUsername());
 				message.setStatus(HttpStatus.OK);
 				message.setResponseMessage(Constants.SUCCESS);
 				message.setData(userDto);

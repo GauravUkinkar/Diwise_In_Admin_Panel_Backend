@@ -9,7 +9,7 @@ import lombok.experimental.Accessors;
 public class RegistrationDto {
 
 		private int id;
-		private String email;
+		private String username;
 		private String password;
 
 
