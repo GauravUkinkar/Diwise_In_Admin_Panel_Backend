@@ -9,6 +9,6 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class UserDto {
 	private int id;
-	private String username;
+	private String email;
 
 }

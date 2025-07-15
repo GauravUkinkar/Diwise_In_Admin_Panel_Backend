@@ -8,6 +8,6 @@ import lombok.experimental.Accessors;
 @ToString
 @Accessors(chain = true)
 public class LoginDto {
-	private String username;
+	private String email;
 	private String password;
 }
