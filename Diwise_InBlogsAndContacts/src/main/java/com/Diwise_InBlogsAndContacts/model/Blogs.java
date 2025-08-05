@@ -2,6 +2,7 @@ package com.Diwise_InBlogsAndContacts.model;
 
 
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,6 +18,7 @@ public class Blogs {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int bId;
 	private String title;
+	@Column(length = 10000)
 	private String description;
 	private String featuredImage;
 	private String category;
