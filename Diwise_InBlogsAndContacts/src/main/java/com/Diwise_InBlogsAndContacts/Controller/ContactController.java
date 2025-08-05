@@ -28,14 +28,12 @@ public class ContactController {
 	
 	@PostMapping("/addContacts")
 	public ResponseEntity<Message<ContactDto>>  addContact(@RequestBody ContactDto contactDto){
-     log.info("In ContactController addContact() with request: {}", contactDto);
 		Message<ContactDto> message = service.addContact(contactDto);
         HttpStatus httpStatus = HttpStatus.valueOf(message.getStatus().value());
         return ResponseEntity.status(httpStatus).body(message);
 	}
 	@GetMapping("/getAllContacts")
 	public ResponseEntity<List<Message<ContactDto>>> getAllContacts(){
-		log.info("In UserController getAllContacts() with request:" );
         List<Message<ContactDto>> message = service.getAllContacts();
         return ResponseEntity.status(HttpStatus.OK).body(message);
 	}

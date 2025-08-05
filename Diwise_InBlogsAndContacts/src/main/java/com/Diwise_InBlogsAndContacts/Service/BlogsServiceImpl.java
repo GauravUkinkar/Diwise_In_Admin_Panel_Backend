@@ -29,7 +29,6 @@ public class BlogsServiceImpl implements BlogsService {
 	@Override
 	public Message<BlogsDto> addBlogs(BlogsDto blogsDto, MultipartFile images) {
 	    Message<BlogsDto> message = new Message<>();
-	    log.info("In BlogsServiceImpl addBlogs() with request: {}", blogsDto);
 
 	    try {
 	        Blogs blog = new Blogs();
@@ -68,7 +67,6 @@ public class BlogsServiceImpl implements BlogsService {
 	@Override
 	public Message<BlogsDto> updateBlog(BlogsDto request, MultipartFile images) {
 	    Message<BlogsDto> message = new Message<>();
-	    log.info("In BlogsServiceImpl updateBlog() with request: {}", request);
 	    try {
 	        Blogs blog = blogsRepository.findById(request.getBId()).orElse(null);
 	        if (blog == null) {

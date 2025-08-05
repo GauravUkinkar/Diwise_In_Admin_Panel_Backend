@@ -47,8 +47,7 @@ public class UserServiceImpl implements UserService {
 	public Message<UserDto> login(LoginDto loginDto) {
 		Message<UserDto> message = new Message<>();
 		User user = new User();
-		user = userRepository.findByUsername(loginDto.getUsername());
-		try {
+		user = userRepository.findByUsername(loginDto.getUsername());		try {
 
 			if (user.getPassword().equals(loginDto.getPassword())) {
 				UserDto userDto = new UserDto();

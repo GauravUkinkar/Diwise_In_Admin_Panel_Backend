@@ -27,7 +27,6 @@ public class UserController {
 	
 	@PostMapping("/register")
 	public ResponseEntity<Message<UserDto>> registerUser(@RequestBody RegistrationDto dto) {
-		log.info("In UserController registerUser() with request: {}", dto);
         Message<UserDto> message = service.register(dto);
         HttpStatus httpStatus = HttpStatus.valueOf(message.getStatus().value());
         return ResponseEntity.status(httpStatus).body(message);
@@ -35,7 +34,6 @@ public class UserController {
 	
 	@PostMapping("/login")
 	public ResponseEntity<Message<UserDto>> login(@RequestBody LoginDto dto) {
-		log.info("In UserController registerUser() with request: {}", dto);
         Message<UserDto> message = service.login(dto);
         HttpStatus httpStatus = HttpStatus.valueOf(message.getStatus().value());
         return ResponseEntity.status(httpStatus).body(message);
